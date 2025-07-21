@@ -1,0 +1,95 @@
+`timescale 1ns / 1ps
+module comparator_bit1(
+input a,b,
+output reg [2:0]q // q[0]:a>b, q[1]:a=b, q[2]=a<b
+    );
+    
+    always @(*)
+    begin
+    if(a>b)
+    begin
+    q[0]<=1;
+    q[1]<=0;
+    q[2]<=0;
+    end
+    else if(a<b)
+    begin
+    q[2]<=1;
+    q[1]<=0;
+    q[0]<=0;
+    end
+    else
+    begin
+    q[1]<=1;
+    q[0]<=0;
+    q[2]<=0;
+    end
+    end
+endmodule
+
+
+module comparator_bit2(
+input [1:0]a,[1:0]b,
+output [5:0]q1,
+output reg q2,q3,q4    //q2:a>b, q3:a=b, q4:a<b
+    );
+  
+    comparator_bit1 A(a[1],b[1],q1[5:3]);
+    comparator_bit1 B(a[0],b[0],q1[2:0]);
+    always @(*)
+    begin
+    if(q1[5])
+    begin
+    q4<=1;
+    q2<=0;
+    q3<=0;
+    end
+    else if(q1[3])
+    begin
+    q2<=1;
+    q3<=0;
+    q4<=4;
+    end
+    else if(q1[4] && q1[2])
+    begin
+    q4<=1;
+    q2<=0;
+    q3<=0;
+    end
+    else if(q1[4] && q1[0])
+    begin
+    q2<=1;
+    q3<=0;
+    q4<=0;
+    end
+    else
+    begin
+    q3<=1;
+    q2<=0;
+    q4<=0;
+    end
+    end
+endmodule
+
+
+
+//Testbench Code
+`timescale 1ns / 1ps
+module comparator_bit2_tb();
+reg [1:0]a;
+reg [1:0]b;
+wire [5:0]q1;
+wire q2,q3,q4;
+comparator_bit2 dut(a,b,q1,q2,q3,q4);
+initial
+begin
+a=11;b=10;
+#10
+a=00;b=10;
+#10
+a=01;b=01;
+#10
+$stop;
+end
+endmodule
+
